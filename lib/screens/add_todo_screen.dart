@@ -17,6 +17,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
 
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
+  String dropValue = 'Work';
 
   void _picker() async {
     DateTime? nD = await showDatePicker(
@@ -125,23 +126,73 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                   )
                 ],
               ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.category,
+                    size: 35,
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: DropdownButton(
+                        // hint: const Padding(
+                        //   padding: EdgeInsets.all(8.0),
+                        //   child: Text('Category'),
+                        // ),
+                        value: dropValue,
+                        
+                        style: const TextStyle(fontSize: 18, color: Colors.black),
+                        isExpanded: true,
+                        iconSize: 42,
+                        dropdownColor: Colors.white,
+                        
+                        // selectedItemBuilder: (context) => ,
+                        underline: const Divider(
+                          endIndent: 0,
+                          indent: 0,
+                          height: 0,
+                          thickness: 2,
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 'Work', child: Text('Work')),
+                          DropdownMenuItem(
+                              value: 'Music', child: Text('Music')),
+                          DropdownMenuItem(
+                              value: 'Travel', child: Text('Travel')),
+                          DropdownMenuItem(
+                              value: 'Study', child: Text('Study')),
+                          DropdownMenuItem(value: 'Home', child: Text('Home')),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            
+                          dropValue = value!;
+                          });
+                        }),
+                  ),
+                  const Spacer(
+                    flex: 2,
+                  )
+                ],
+              ),
               const Spacer(),
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         if (_notificationDate == null ||
                             _controller.text.isEmpty ||
                             _noteController.text.isEmpty) {
                           return;
                         }
-                        await Provider.of<DBHelper>(context, listen: false).addTodo(
+                        await Provider.of<DBHelper>(context, listen: false)
+                            .addTodo(
                           date: _notificationDate!,
                           title: _controller.text,
                           note: _noteController.text,
                         );
-                        
+
                         context.go('/');
                       },
                       style: ElevatedButton.styleFrom(

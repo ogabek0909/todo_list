@@ -32,12 +32,12 @@ class DBHelper with ChangeNotifier {
     );
   }
 
-  Future<List<Map<String, Object?>>> getTodo() async {
+  Future getTodo() async {
     final db = await dbOpen();
     final justTodo = db.query('test');
     _todoList = await justTodo;
     notifyListeners();
-    return justTodo;
+    
   }
 
   Future deleteTodo(String id) async {

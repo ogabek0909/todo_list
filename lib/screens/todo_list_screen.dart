@@ -11,57 +11,79 @@ class TodoListScreen extends StatefulWidget {
 }
 
 class _TodoListScreenState extends State<TodoListScreen> {
+  bool isInit = true;
   @override
   void initState() {
+    Provider.of<DBHelper>(context, listen: false).getTodo().then((_) {
+      setState(() {
+        isInit = false;
+      });
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    print('buildFunction');
     return Scaffold(
       appBar: AppBar(),
-      body: FutureBuilder(
-        future: Provider.of<DBHelper>(context, listen: false).getTodo(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                snapshot.error.toString(),
-              ),
-            );
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                return Consumer<DBHelper>(
+      body: isInit
+          ? const Center(child: CircularProgressIndicator())
+          : Consumer<DBHelper>(
+              builder: (context, value, child) => ListView.builder(
+                itemCount: value.todoList.length,
+                itemBuilder: (context, index) {
+                  return Dismissible(
+                    key: ValueKey(index),
+                    confirmDismiss: (direction) {
+                      return showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            content: const Text(
+                              'Really, Do you want to delete this todo?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('No'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  await value
+                                      .deleteTodo(value.todoList[index]['id']);
+                                },
+                                child: const Text('Yes'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    direction: DismissDirection.endToStart,
+                    child: ListTile(
+                      title: Text(value.todoList[index]['title'] as String),
+                      subtitle: Text(value.todoList[index]['id'] as String),
+                      trailing: Checkbox(
+                        value: (value.todoList[index]['done'] as int) == 1
+                            ? true
+                            : false,
+                        onChanged: (v) async {
+                          await value.updateTodo(
+                              v!, value.todoList[index]['id'] as String, index);
 
-                  builder: (context, value, child) => ListTile(
-                    title: Text(snapshot.data![index]['title'] as String),
-                    subtitle: Text(snapshot.data![index]['id'] as String),
-                    trailing: Checkbox(
-                      value: (value.todoList[index]['done'] as int) == 1
-                          ? true
-                          : false,
-                      onChanged: (v) async {
-                        print(value.todoList);
-                        await value.updateTodo(
-                          v!,
-                          snapshot.data![index]['id'] as String,
-                          index
-                        );
-                        // print('object');
-                        // value.useChecker(v);
-                      },
+                          await value.getTodo();
+                          // print('object');
+                          // value.useChecker(v);
+                        },
+                      ),
                     ),
-                  ),
-                );
-              },
-            );
-          }
-        },
-      ),
+                  );
+                },
+              ),
+            ),
     );
   }
 }

@@ -156,23 +156,25 @@ class OverviewScreen extends StatelessWidget {
         ),
       ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-      floatingActionButton: InkWell(
-        onTap: () {
-          context.go('/${AddTodoScreen.routeName}');
-        },
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 20, right: 15),
-          height: deviceSize.width / (205 / 39),
-          width: deviceSize.width / (205 / 39),
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: Colors.blue,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.add,
-            size: 40,
-            color: Colors.white,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 20, right: 15),
+        child: GestureDetector(
+          onTap: () {
+            context.go('/${AddTodoScreen.routeName}');
+          },
+          child: Container(
+            height: deviceSize.width / (205 / 39),
+            width: deviceSize.width / (205 / 39),
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: Colors.blue,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.add,
+              size: 40,
+              color: Colors.white,
+            ),
           ),
         ),
       ),
